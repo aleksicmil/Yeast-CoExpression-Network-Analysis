@@ -13,7 +13,6 @@ import os
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import networkx as nx
 from scipy import stats
 from matplotlib import pyplot as plt
 
@@ -21,8 +20,9 @@ os.chdir('F:\\PDS\\Project')
 
 # Read the data
 
-data = pd.read_csv('Data\\sgd.txt', sep='\t', na_values = '?', dtype='float')
+data = pd.read_csv('Data\\sgd.tab', sep='\t', na_values = '?', dtype='float')
 labels = list(data.columns)
+
 
 # Replace missing values with gene(column) median and store it as numpy matrix
 
@@ -42,6 +42,7 @@ corr_org = corr_mat.reshape(1799*1799,)
 np.savetxt('Data\\original_corr_mat.txt', corr_mat, delimiter=',') 
 
 # Present original matrix as heatmap
+
 fig1 = sns.heatmap(corr_mat)
 fig1 = fig1.get_figure()
 fig1.savefig("Plots//original_corr_mat_HM.png", dpi = 900)
@@ -80,7 +81,7 @@ treshold_up = np.percentile(corrs, 99)
 treshold_down = np.percentile(corrs, 1)
 
 
-adj_mat = np.copy(corr_mat)
+adj_mat = np.copy(corr_mat) # both positive and negative correlations
 for i in range(1799):
     for j in range(1799):
         if np.logical_or(adj_mat[i, j] > treshold_up, adj_mat[i, j] < treshold_down):
@@ -89,7 +90,7 @@ for i in range(1799):
             adj_mat[i, j] = 0
 
 
-neg_adj_mat = np.copy(corr_mat)
+neg_adj_mat = np.copy(corr_mat) # only negative correlations
 for i in range(1799):
     for j in range(1799):
         if neg_adj_mat[i, j] < treshold_down:
@@ -99,7 +100,7 @@ for i in range(1799):
 
 np.fill_diagonal(neg_adj_mat, 1)
 
-pos_adj_mat = np.copy(corr_mat)
+pos_adj_mat = np.copy(corr_mat) # only positive correlations
 for i in range(1799):
     for j in range(1799):
         if pos_adj_mat[i, j] > treshold_up:
